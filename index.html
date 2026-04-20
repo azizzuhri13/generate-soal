@@ -53,7 +53,7 @@
                 isLoading: false,
                 activeTab: 'soal', 
                 
-                // PERBAIKAN: Jangan memanggil localStorage langsung di sini untuk mencegah Blank Screen
+                // PERBAIKAN FATAL ANTI-BLANK SCREEN: Variabel dikosongkan di awal agar tidak crash
                 apiKey: '', 
                 
                 toast: { show: false, message: '', type: 'info' },
@@ -104,11 +104,11 @@
                 },
                 
                 init() {
-                    // PENGAMAN ANTI BLANK SCREEN JIKA LOCAL STORAGE DIBLOKIR EKSTENSI SPOOFER
+                    // PENGAMAN AMAN: LocalStorage hanya dipanggil di dalam zona yang dilindungi
                     try {
                         this.apiKey = localStorage.getItem('geminiApiKey') || '';
                     } catch (e) {
-                        console.warn("Akses LocalStorage diblokir oleh ekstensi browser Anda.");
+                        console.warn("Akses LocalStorage diblokir oleh browser (Incognito/Spoofer).");
                     }
 
                     try {
@@ -821,7 +821,7 @@ Format JSON:
 
                     <div class="text-left mb-8 mt-4">
                         <h2 class="text-sm sm:text-base font-bold text-slate-800 uppercase mb-3" x-text="formData.jenisAsesmen"></h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs sm:text-sm text-slate-700">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs sm:text-sm text-slate-700">
                             <div class="flex">
                                 <span class="w-28 sm:w-32 shrink-0">Mata Pelajaran</span>
                                 <span class="mr-2">:</span> 
