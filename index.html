@@ -26,7 +26,7 @@
     </script>
     <style>
         [x-cloak] { display: none !important; }
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -432,7 +432,6 @@ Format JSON:
 
                     while (attempt < maxRetries && !success) {
                         try {
-                            // MENGGUNAKAN MODEL TERBARU gemini-2.5-flash SESUAI DAFTAR AKUN ANDA
                             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -444,7 +443,6 @@ Format JSON:
 
                             const resultJson = await response.json();
 
-                            // TANGKAP ERROR SECARA TRANSPARAN (AGAR KITA TAHU PASTI APA PENYEBABNYA)
                             if (!response.ok || resultJson.error) {
                                 const errCode = resultJson.error?.code || response.status;
                                 const errMsg = resultJson.error?.message || "Terjadi kesalahan yang tidak diketahui.";
@@ -452,7 +450,7 @@ Format JSON:
                                 if (errCode === 503 || errCode === 429) {
                                     throw new Error("OVERLOAD"); 
                                 } else {
-                                    throw new Error(`[Code ${errCode}] ${errMsg}`); // Lempar error aslinya
+                                    throw new Error(`[Code ${errCode}] ${errMsg}`);
                                 }
                             }
 
@@ -529,7 +527,6 @@ Format JSON:
                                 await new Promise(resolve => setTimeout(resolve, 3000));
                             } else {
                                 this.isLoading = false;
-                                // Menampilkan pesan error sebenarnya, bukan disembunyikan
                                 let finalMsg = error.message;
                                 if (finalMsg === "OVERLOAD") {
                                     finalMsg = "Kuota API Key Anda habis atau server sedang sangat penuh.";
@@ -545,7 +542,6 @@ Format JSON:
         });
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="text-slate-800 font-sans" x-data="appData" x-cloak>
 
@@ -562,7 +558,7 @@ Format JSON:
         <span class="text-sm font-semibold" x-text="toast.message"></span>
     </div>
 
-    <nav class="bg-white border-b border-slate-200 py-3 px-6 flex justify-center items-center sticky top-0 z-10 shadow-sm no-print">
+    <nav class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 flex justify-center items-center sticky top-0 z-10 shadow-sm no-print">
         <div class="flex items-center gap-2">
             <div class="bg-primary text-white p-1.5 rounded-lg">
                 <i class="ph-fill ph-files text-xl"></i>
@@ -574,10 +570,11 @@ Format JSON:
         </div>
     </nav>
 
-    <main class="max-w-[1400px] mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6 items-start">
+    <!-- CONTAINER UTAMA DIPERBARUI UNTUK MOBILE -->
+    <main class="max-w-[1400px] mx-auto p-3 sm:p-4 md:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6 items-start">
         
         <aside class="w-full lg:w-[350px] shrink-0 space-y-4 no-print">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5">
                 <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2 mb-4">
                     <i class="ph-fill ph-book-open text-primary"></i> Pilih Kurikulum
                 </h2>
@@ -601,12 +598,13 @@ Format JSON:
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5">
                 <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2 mb-4">
                     <i class="ph-fill ph-identification-card text-primary"></i> Identitas Soal
                 </h2>
                 <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
+                    <!-- RESPONSIVE GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nama Guru</label>
                             <input type="text" x-model="formData.guru" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="Nama Guru">
@@ -616,7 +614,8 @@ Format JSON:
                             <input type="text" x-model="kopSurat.sekolah" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Nama Sekolah">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+                    <!-- RESPONSIVE GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Jenjang</label>
                             <select x-model="formData.jenjang" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
@@ -641,12 +640,13 @@ Format JSON:
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5">
                 <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2 mb-4">
                     <i class="ph-fill ph-sliders text-primary"></i> Konfigurasi Soal
                 </h2>
                 
-                <div class="grid grid-cols-2 gap-3 mb-4">
+                <!-- RESPONSIVE GRID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="text-[11px] font-semibold text-slate-500 mb-1.5 block">Jenis Asesmen</label>
                         <select x-model="formData.jenisAsesmen" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
@@ -673,16 +673,16 @@ Format JSON:
                         <span class="bg-secondary text-primary text-[10px] font-bold px-2 py-0.5 rounded-full" x-text="'Total: ' + totalSoal"></span>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div class="text-center p-2 border border-slate-200 rounded-xl bg-slate-50">
-                            <p class="text-[10px] text-slate-500 font-semibold mb-1 truncate">Pilihan Ganda</p>
+                        <div class="text-center p-1 sm:p-2 border border-slate-200 rounded-xl bg-slate-50">
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 font-semibold mb-1 truncate">Pilihan Ganda</p>
                             <input type="number" x-model.number="formData.jumlahPG" class="w-full text-center font-bold text-sm bg-white border border-slate-200 rounded-md py-1 outline-none focus:border-primary" min="0" max="100">
                         </div>
-                        <div class="text-center p-2 border border-slate-200 rounded-xl bg-slate-50">
-                            <p class="text-[10px] text-slate-500 font-semibold mb-1 truncate">Isian Singkat</p>
+                        <div class="text-center p-1 sm:p-2 border border-slate-200 rounded-xl bg-slate-50">
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 font-semibold mb-1 truncate">Isian Singkat</p>
                             <input type="number" x-model.number="formData.jumlahIsian" class="w-full text-center font-bold text-sm bg-white border border-slate-200 rounded-md py-1 outline-none focus:border-primary" min="0" max="50">
                         </div>
-                        <div class="text-center p-2 border border-slate-200 rounded-xl bg-slate-50">
-                            <p class="text-[10px] text-slate-500 font-semibold mb-1 truncate">Essay/Uraian</p>
+                        <div class="text-center p-1 sm:p-2 border border-slate-200 rounded-xl bg-slate-50">
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 font-semibold mb-1 truncate">Essay/Uraian</p>
                             <input type="number" x-model.number="formData.jumlahEssay" class="w-full text-center font-bold text-sm bg-white border border-slate-200 rounded-md py-1 outline-none focus:border-primary" min="0" max="20">
                         </div>
                     </div>
@@ -696,32 +696,32 @@ Format JSON:
                         <div class="flex items-center justify-between p-2.5 bg-purple-50 rounded-xl border border-purple-100">
                             <div class="flex items-start gap-2">
                                 <i class="ph-fill ph-magic-wand text-purple-500 mt-0.5"></i>
-                                <div>
-                                    <p class="text-[11px] font-bold text-purple-700">Soal dengan Ilustrasi AI</p>
-                                    <p class="text-[9px] text-purple-500/80">Jumlah soal yang perlu gambar ilustrasi</p>
+                                <div class="pr-2">
+                                    <p class="text-[11px] font-bold text-purple-700">Soal Ilustrasi AI</p>
+                                    <p class="text-[9px] text-purple-500/80 leading-tight">Jumlah soal yg perlu gambar ilustrasi</p>
                                 </div>
                             </div>
-                            <input type="number" x-model.number="formData.jumlahIlustrasi" class="w-12 text-center font-bold text-sm bg-white border border-purple-200 rounded-md py-1 outline-none focus:border-purple-400 text-purple-900" min="0" max="20">
+                            <input type="number" x-model.number="formData.jumlahIlustrasi" class="w-12 text-center font-bold text-sm bg-white border border-purple-200 rounded-md py-1 outline-none focus:border-purple-400 text-purple-900 shrink-0" min="0" max="20">
                         </div>
                         <div class="flex items-center justify-between p-2.5 bg-green-50 rounded-xl border border-green-100">
                             <div class="flex items-start gap-2">
                                 <i class="ph-fill ph-chart-bar text-green-500 mt-0.5"></i>
-                                <div>
-                                    <p class="text-[11px] font-bold text-green-700">Soal dengan Diagram/Grafik</p>
-                                    <p class="text-[9px] text-green-500/80">Jumlah soal berbasis data visual</p>
+                                <div class="pr-2">
+                                    <p class="text-[11px] font-bold text-green-700">Soal Diagram/Grafik</p>
+                                    <p class="text-[9px] text-green-500/80 leading-tight">Jumlah soal berbasis data visual</p>
                                 </div>
                             </div>
-                            <input type="number" x-model.number="formData.jumlahDiagram" class="w-12 text-center font-bold text-sm bg-white border border-green-200 rounded-md py-1 outline-none focus:border-green-400 text-green-900" min="0" max="20">
+                            <input type="number" x-model.number="formData.jumlahDiagram" class="w-12 text-center font-bold text-sm bg-white border border-green-200 rounded-md py-1 outline-none focus:border-green-400 text-green-900 shrink-0" min="0" max="20">
                         </div>
                         <div class="flex items-center justify-between p-2.5 bg-yellow-50 rounded-xl border border-yellow-100">
                             <div class="flex items-start gap-2">
                                 <i class="ph-fill ph-tree-structure text-yellow-500 mt-0.5"></i>
-                                <div>
+                                <div class="pr-2">
                                     <p class="text-[11px] font-bold text-yellow-700">Soal Peta Konsep</p>
-                                    <p class="text-[9px] text-yellow-600/80">Jumlah soal melengkapi peta konsep</p>
+                                    <p class="text-[9px] text-yellow-600/80 leading-tight">Jumlah soal melengkapi peta konsep</p>
                                 </div>
                             </div>
-                            <input type="number" x-model.number="formData.jumlahPetaKonsep" class="w-12 text-center font-bold text-sm bg-white border border-yellow-200 rounded-md py-1 outline-none focus:border-yellow-400 text-yellow-900" min="0" max="20">
+                            <input type="number" x-model.number="formData.jumlahPetaKonsep" class="w-12 text-center font-bold text-sm bg-white border border-yellow-200 rounded-md py-1 outline-none focus:border-yellow-400 text-yellow-900 shrink-0" min="0" max="20">
                         </div>
                     </div>
                 </div>
@@ -735,21 +735,25 @@ Format JSON:
 
         </aside>
 
-        <section class="flex-1 w-full flex flex-col h-[calc(100vh-100px)] print-area">
+        <!-- FLEX HEIGHT DIBUAT FLEKSIBEL UNTUK MOBILE AGAR TIDAK TERPOTONG -->
+        <section class="flex-1 w-full flex flex-col min-h-[600px] lg:h-[calc(100vh-100px)] print-area">
             
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 mb-4 flex flex-wrap gap-2 items-center justify-between no-print">
-                <div class="flex gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 overflow-x-auto">
-                    <button @click="activeTab = 'soal'" :class="activeTab === 'soal' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap">
+            <!-- HEADER KANAN DIPERBARUI AGAR BISA MEMBUNGKUS (WRAP) DI HP -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 mb-4 flex flex-col xl:flex-row gap-3 items-start xl:items-center justify-between no-print">
+                <div class="flex gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 overflow-x-auto w-full xl:w-auto">
+                    <button @click="activeTab = 'soal'" :class="activeTab === 'soal' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap shrink-0">
                         <i class="ph-fill ph-file-text"></i> Soal
                     </button>
-                    <button @click="activeTab = 'kunci'" :class="activeTab === 'kunci' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap">
+                    <button @click="activeTab = 'kunci'" :class="activeTab === 'kunci' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap shrink-0">
                         <i class="ph-fill ph-key"></i> Kunci
                     </button>
-                    <button @click="activeTab = 'kisi'" :class="activeTab === 'kisi' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap">
+                    <button @click="activeTab = 'kisi'" :class="activeTab === 'kisi' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap shrink-0">
                         <i class="ph-fill ph-table"></i> Kisi-kisi
                     </button>
                 </div>
-                <div class="flex gap-2 items-center">
+                
+                <!-- TOMBOL EKSPOR DIUBAH MENJADI FLEX-WRAP AGAR AMAN DI LAYAR KECIL -->
+                <div class="flex flex-wrap gap-2 items-center w-full xl:w-auto">
                     <input type="file" id="importFile" accept=".json" class="hidden" @change="handleImport">
                     <button @click="triggerImport" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 border border-amber-200" title="Import JSON">
                         <i class="ph-fill ph-upload-simple"></i> Import
@@ -772,68 +776,68 @@ Format JSON:
                 </div>
             </div>
 
-            <div id="printable-area" class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 overflow-y-auto p-6 lg:p-10 relative print-area">
+            <div id="printable-area" class="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 relative print-area">
                 
-                <div x-show="results.length === 0 && !isLoading" class="h-full flex flex-col items-center justify-center text-slate-400 no-print">
+                <div x-show="results.length === 0 && !isLoading" class="h-full flex flex-col items-center justify-center text-slate-400 no-print py-10">
                     <div class="bg-slate-50 p-6 rounded-full mb-4 border border-slate-100">
                         <i class="ph-duotone ph-files text-6xl text-slate-300"></i>
                     </div>
                     <h3 class="text-lg font-semibold text-slate-600 mb-1">Area Pratinjau Kosong</h3>
-                    <p class="text-sm text-center max-w-sm">Silakan isi form di sebelah kiri dan klik "Buat Soal Otomatis" untuk menghasilkan dokumen soal.</p>
+                    <p class="text-sm text-center max-w-sm px-4">Silakan isi form di sebelah kiri dan klik "Buat Soal Otomatis" untuk menghasilkan dokumen soal.</p>
                 </div>
 
-                <div x-show="isLoading" class="h-full flex flex-col items-center justify-center text-primary no-print">
+                <div x-show="isLoading" class="h-full flex flex-col items-center justify-center text-primary no-print py-10">
                     <i class="ph-bold ph-circle-notch animate-spin text-4xl mb-4"></i>
                     <p class="font-medium animate-pulse">Kecerdasan Buatan sedang merumuskan soal...</p>
                 </div>
 
                 <div x-show="results.length > 0 && !isLoading" style="display: none;" x-transition.opacity>
                     
-                    <div class="mb-8 border-b-4 border-double border-slate-800 pb-4 flex items-center justify-between">
-                        <div class="w-20 h-20 flex items-center justify-center shrink-0">
+                    <div class="mb-8 border-b-4 border-double border-slate-800 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
                             <template x-if="kopSurat.logo">
                                 <img :src="kopSurat.logo" class="max-w-full max-h-full object-contain">
                             </template>
                         </div>
                         
-                        <div class="flex-1 text-center px-4">
-                            <h1 class="text-2xl font-black text-slate-900 uppercase tracking-wide" x-text="kopSurat.sekolah"></h1>
-                            <p class="text-xs text-slate-700 mt-1" x-text="kopSurat.alamat"></p>
-                            <p class="text-xs text-slate-700 mt-0.5">
+                        <div class="flex-1 text-center px-2 sm:px-4">
+                            <h1 class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-wide" x-text="kopSurat.sekolah"></h1>
+                            <p class="text-[10px] sm:text-xs text-slate-700 mt-1" x-text="kopSurat.alamat"></p>
+                            <p class="text-[10px] sm:text-xs text-slate-700 mt-0.5">
                                 Telp: <span x-text="kopSurat.telepon"></span> | Email: <span x-text="kopSurat.email"></span>
                             </p>
                         </div>
-                        <div class="w-20 h-20 shrink-0"></div> 
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 hidden sm:block"></div> 
                     </div>
 
                     <div class="text-left mb-8 mt-4">
-                        <h2 class="text-base font-bold text-slate-800 uppercase mb-3" x-text="formData.jenisAsesmen"></h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-slate-700">
+                        <h2 class="text-sm sm:text-base font-bold text-slate-800 uppercase mb-3" x-text="formData.jenisAsesmen"></h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs sm:text-sm text-slate-700">
                             <div class="flex">
-                                <span class="w-32 shrink-0">Mata Pelajaran</span>
+                                <span class="w-28 sm:w-32 shrink-0">Mata Pelajaran</span>
                                 <span class="mr-2">:</span> 
-                                <span class="font-semibold" x-text="formData.mapel"></span>
+                                <span class="font-semibold break-words" x-text="formData.mapel"></span>
                             </div>
                             <div class="flex">
-                                <span class="w-32 shrink-0">Kelas / Jenjang</span>
+                                <span class="w-28 sm:w-32 shrink-0">Kelas / Jenjang</span>
                                 <span class="mr-2">:</span> 
                                 <span class="font-semibold" x-text="formData.jenjang + ' Kelas ' + formData.kelas"></span>
                             </div>
                             <div class="flex">
-                                <span class="w-32 shrink-0">Kurikulum</span>
+                                <span class="w-28 sm:w-32 shrink-0">Kurikulum</span>
                                 <span class="mr-2">:</span> 
                                 <span class="font-semibold" x-text="formData.kurikulum"></span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 text-primary font-bold text-lg mb-6 no-print">
+                    <div class="flex flex-wrap items-center gap-2 text-primary font-bold text-base sm:text-lg mb-6 no-print">
                         <i class="ph-fill ph-check-circle" x-show="activeTab === 'soal'"></i>
                         <i class="ph-fill ph-key" x-show="activeTab === 'kunci'"></i>
                         <i class="ph-fill ph-table" x-show="activeTab === 'kisi'"></i>
                         
                         <h2 x-show="activeTab === 'soal'">Lembar Soal Evaluasi</h2>
-                        <h2 x-show="activeTab === 'kunci'">Lembar Kunci Jawaban & Pembahasan</h2>
+                        <h2 x-show="activeTab === 'kunci'">Lembar Kunci Jawaban</h2>
                         <h2 x-show="activeTab === 'kisi'">Tabel Kisi-Kisi Soal</h2>
                         
                         <span class="text-slate-400 font-normal text-sm" x-text="'(' + results.length + ' item)'"></span>
@@ -841,37 +845,37 @@ Format JSON:
 
                     <div x-show="activeTab === 'soal'" class="space-y-6">
                         <template x-for="(soal, index) in results" :key="'soal-'+index">
-                            <div class="flex gap-4 p-5 rounded-2xl border border-slate-100 bg-white hover:border-primary/30 transition-colors shadow-sm relative group page-break">
+                            <div class="flex gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-slate-100 bg-white hover:border-primary/30 transition-colors shadow-sm relative group page-break">
                                 
-                                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10 no-print">
-                                    <button @click="editingIndex = index" class="p-1.5 text-slate-400 hover:text-primary hover:bg-secondary rounded-lg transition" title="Edit Soal"><i class="ph-fill ph-pencil-simple text-lg"></i></button>
-                                    <button @click="deleteConfirm = { show: true, index: index }" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Hapus Soal"><i class="ph-fill ph-trash text-lg"></i></button>
+                                <div class="absolute top-2 right-2 sm:top-4 sm:right-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex gap-1 sm:gap-2 z-10 no-print">
+                                    <button @click="editingIndex = index" class="p-1 sm:p-1.5 text-slate-400 hover:text-primary hover:bg-secondary rounded-lg transition" title="Edit Soal"><i class="ph-fill ph-pencil-simple text-base sm:text-lg"></i></button>
+                                    <button @click="deleteConfirm = { show: true, index: index }" class="p-1 sm:p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Hapus Soal"><i class="ph-fill ph-trash text-base sm:text-lg"></i></button>
                                 </div>
 
-                                <div class="w-8 h-8 rounded-full bg-secondary text-primary flex items-center justify-center font-bold text-sm shrink-0 border border-primary/20">
+                                <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-secondary text-primary flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 border border-primary/20">
                                     <span x-text="index + 1"></span>
                                 </div>
                                 
-                                <div class="flex-1">
+                                <div class="flex-1 min-w-0">
                                     <template x-if="editingIndex !== index">
-                                        <p class="text-[15px] font-medium text-slate-800 mb-4 leading-relaxed pr-16" x-html="soal.pertanyaan"></p>
+                                        <p class="text-sm sm:text-[15px] font-medium text-slate-800 mb-4 leading-relaxed sm:pr-16 break-words" x-html="soal.pertanyaan"></p>
                                     </template>
                                     
                                     <template x-if="editingIndex === index">
-                                        <div class="mb-4 pr-16 no-print space-y-4 bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-inner">
+                                        <div class="mb-4 pr-0 sm:pr-16 no-print space-y-4 bg-slate-50 border border-slate-200 p-3 sm:p-4 rounded-xl shadow-inner">
                                             <div>
-                                                <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Pertanyaan</label>
-                                                <textarea x-model="soal.pertanyaan" class="w-full text-[15px] font-medium text-slate-800 border border-slate-300 focus:ring-2 focus:ring-primary/20 focus:border-primary rounded-lg p-3 outline-none transition bg-white" rows="3"></textarea>
+                                                <label class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Pertanyaan</label>
+                                                <textarea x-model="soal.pertanyaan" class="w-full text-sm sm:text-[15px] font-medium text-slate-800 border border-slate-300 focus:ring-2 focus:ring-primary/20 focus:border-primary rounded-lg p-2 sm:p-3 outline-none transition bg-white" rows="3"></textarea>
                                             </div>
 
                                             <template x-if="soal.jenis === 'Pilihan Ganda'">
                                                 <div>
-                                                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Opsi Jawaban</label>
+                                                    <label class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Opsi Jawaban</label>
                                                     <div class="space-y-2">
                                                         <template x-for="(opsi, idx) in soal.opsi" :key="idx">
                                                             <div class="flex items-center gap-2">
-                                                                <span class="text-sm font-bold text-slate-600 w-6" x-text="String.fromCharCode(65 + idx) + '.'"></span>
-                                                                <input type="text" x-model="soal.opsi[idx]" class="flex-1 text-sm border border-slate-300 rounded-md p-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition bg-white">
+                                                                <span class="text-xs sm:text-sm font-bold text-slate-600 w-5 sm:w-6" x-text="String.fromCharCode(65 + idx) + '.'"></span>
+                                                                <input type="text" x-model="soal.opsi[idx]" class="flex-1 text-xs sm:text-sm border border-slate-300 rounded-md p-1.5 sm:p-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition bg-white">
                                                             </div>
                                                         </template>
                                                     </div>
@@ -880,49 +884,49 @@ Format JSON:
 
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label class="text-[11px] font-bold uppercase tracking-wider text-green-600 mb-1.5 block">Kunci Jawaban</label>
-                                                    <input type="text" x-model="soal.kunci" class="w-full text-sm border border-green-300 rounded-md p-2 focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none transition bg-green-50/50">
+                                                    <label class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-green-600 mb-1.5 block">Kunci Jawaban</label>
+                                                    <input type="text" x-model="soal.kunci" class="w-full text-xs sm:text-sm border border-green-300 rounded-md p-1.5 sm:p-2 focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none transition bg-green-50/50">
                                                 </div>
                                                 <div>
-                                                    <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Pembahasan / Rubrik</label>
-                                                    <textarea x-model="soal.alasan" class="w-full text-sm border border-slate-300 rounded-md p-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition bg-white" rows="2"></textarea>
+                                                    <label class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Pembahasan / Rubrik</label>
+                                                    <textarea x-model="soal.alasan" class="w-full text-xs sm:text-sm border border-slate-300 rounded-md p-1.5 sm:p-2 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition bg-white" rows="2"></textarea>
                                                 </div>
                                             </div>
 
                                             <div class="flex gap-2 mt-4 pt-3 border-t border-slate-200">
-                                                <button @click="editingIndex = null" class="bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-[#4a3bb5] transition flex items-center gap-2">
-                                                    <i class="ph-bold ph-check"></i> Simpan Perubahan
+                                                <button @click="editingIndex = null" class="bg-primary text-white px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold shadow-sm hover:bg-[#4a3bb5] transition flex items-center gap-2">
+                                                    <i class="ph-bold ph-check"></i> Simpan
                                                 </button>
                                             </div>
                                         </div>
                                     </template>
                                     
                                     <template x-if="Boolean(soal.prompt_gambar) && !soal.gambar">
-                                        <div class="mb-5 border border-purple-200 rounded-xl overflow-hidden bg-purple-50 p-4 shadow-sm no-print">
+                                        <div class="mb-5 border border-purple-200 rounded-xl overflow-hidden bg-purple-50 p-3 sm:p-4 shadow-sm no-print">
                                             <div class="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-                                                <div class="flex items-center gap-2 text-purple-700 font-semibold text-sm">
+                                                <div class="flex items-center gap-2 text-purple-700 font-semibold text-xs sm:text-sm">
                                                     <i class="ph-fill ph-image text-lg"></i> Ilustrasi Visual:
                                                 </div>
-                                                <button @click="generateImage(index, soal.prompt_gambar)" :disabled="soal.isGeneratingImage" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm disabled:opacity-50 disabled:cursor-wait shrink-0">
+                                                <button @click="generateImage(index, soal.prompt_gambar)" :disabled="soal.isGeneratingImage" class="w-full sm:w-auto justify-center bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm disabled:opacity-50 disabled:cursor-wait shrink-0">
                                                     <i x-show="!soal.isGeneratingImage" class="ph-bold ph-magic-wand"></i>
                                                     <i x-show="soal.isGeneratingImage" class="ph-bold ph-spinner animate-spin"></i>
                                                     <span x-text="soal.isGeneratingImage ? 'Membuat Gambar...' : 'Generate Gambar'"></span>
                                                 </button>
                                             </div>
-                                            <p class="text-[13px] text-purple-600/80 mt-2 leading-relaxed" x-text="soal.prompt_gambar"></p>
+                                            <p class="text-[11px] sm:text-[13px] text-purple-600/80 mt-2 leading-relaxed" x-text="soal.prompt_gambar"></p>
                                         </div>
                                     </template>
 
                                     <template x-if="soal.gambar">
-                                        <div class="mb-5 border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 p-3 flex flex-col items-center justify-center shadow-inner relative group">
-                                            <img :src="soal.gambar" alt="Ilustrasi Soal" class="max-w-full max-h-56 object-contain rounded shadow-sm">
+                                        <div class="mb-5 border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50 p-2 sm:p-3 flex flex-col items-center justify-center shadow-inner relative group">
+                                            <img :src="soal.gambar" alt="Ilustrasi Soal" class="max-w-full max-h-48 sm:max-h-56 object-contain rounded shadow-sm">
                                             
-                                            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 no-print">
-                                                <button @click="generateImage(index, soal.prompt_gambar)" class="p-1.5 bg-white text-purple-600 hover:bg-purple-50 border border-purple-100 rounded-md shadow-sm transition" title="Buat Ulang Gambar (Regenerate)">
-                                                    <i class="ph-bold ph-arrows-clockwise text-lg"></i>
+                                            <div class="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex gap-2 no-print">
+                                                <button @click="generateImage(index, soal.prompt_gambar)" class="p-1 sm:p-1.5 bg-white text-purple-600 hover:bg-purple-50 border border-purple-100 rounded-md shadow-sm transition" title="Buat Ulang Gambar">
+                                                    <i class="ph-bold ph-arrows-clockwise text-base sm:text-lg"></i>
                                                 </button>
-                                                <button @click="soal.gambar = null" class="p-1.5 bg-white text-red-500 hover:bg-red-50 border border-red-100 rounded-md shadow-sm transition" title="Hapus Gambar">
-                                                    <i class="ph-bold ph-trash text-lg"></i>
+                                                <button @click="soal.gambar = null" class="p-1 sm:p-1.5 bg-white text-red-500 hover:bg-red-50 border border-red-100 rounded-md shadow-sm transition" title="Hapus Gambar">
+                                                    <i class="ph-bold ph-trash text-base sm:text-lg"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -931,9 +935,9 @@ Format JSON:
                                     <template x-if="soal.jenis === 'Pilihan Ganda'">
                                         <div class="space-y-2 mb-4">
                                             <template x-for="(opsi, idx) in (soal.opsi || [])" :key="idx">
-                                                <div class="flex gap-3 items-start text-sm">
+                                                <div class="flex gap-2 sm:gap-3 items-start text-xs sm:text-sm">
                                                     <span class="font-semibold text-slate-600 mt-[1px]" x-text="String.fromCharCode(65 + idx) + '.'"></span>
-                                                    <span class="text-slate-700" x-text="opsi"></span>
+                                                    <span class="text-slate-700 break-words" x-text="opsi"></span>
                                                 </div>
                                             </template>
                                         </div>
@@ -941,21 +945,21 @@ Format JSON:
 
                                     <template x-if="soal.jenis === 'Isian Singkat'">
                                         <div class="mt-4 mb-4 flex items-end gap-2">
-                                            <span class="text-slate-600 text-sm font-medium">Jawaban:</span>
+                                            <span class="text-slate-600 text-xs sm:text-sm font-medium">Jawaban:</span>
                                             <div class="flex-1 border-b-2 border-dashed border-slate-300"></div>
                                         </div>
                                     </template>
 
                                     <template x-if="soal.jenis === 'Essay'">
-                                        <div class="mt-4 mb-4 border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50/50 min-h-[120px] flex items-center justify-center">
-                                            <span class="text-slate-400 text-sm font-medium">Area Jawaban Peserta Didik</span>
+                                        <div class="mt-4 mb-4 border-2 border-dashed border-slate-200 rounded-xl p-4 bg-slate-50/50 min-h-[80px] sm:min-h-[120px] flex items-center justify-center">
+                                            <span class="text-slate-400 text-xs sm:text-sm font-medium">Area Jawaban Peserta Didik</span>
                                         </div>
                                     </template>
 
-                                    <div class="flex items-center gap-3 border-t border-slate-100 pt-3 mt-2 no-print">
-                                        <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-list-bullets"></i> <span x-text="soal.jenis || '-'"></span></div>
-                                        <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-brain"></i> <span x-text="typeof soal.kognitif === 'string' ? soal.kognitif.split(' ')[0] : '-'"></span></div>
-                                        <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-link"></i> <span x-text="soal.kesulitan || '-'"></span></div>
+                                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 border-t border-slate-100 pt-3 mt-2 no-print">
+                                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-list-bullets"></i> <span x-text="soal.jenis || '-'"></span></div>
+                                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-brain"></i> <span x-text="typeof soal.kognitif === 'string' ? soal.kognitif.split(' ')[0] : '-'"></span></div>
+                                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-slate-500"><i class="ph-fill ph-link"></i> <span x-text="soal.kesulitan || '-'"></span></div>
                                     </div>
                                 </div>
                             </div>
@@ -964,19 +968,19 @@ Format JSON:
 
                     <div x-show="activeTab === 'kunci'" class="space-y-6">
                         <template x-for="(soal, index) in results" :key="'kunci-'+index">
-                            <div class="p-5 rounded-2xl border border-green-100 bg-green-50/30 page-break">
-                                <div class="flex gap-3 mb-3 items-start">
-                                    <span class="font-bold text-green-700 w-6 shrink-0" x-text="index + 1 + '.'"></span>
-                                    <p class="text-sm font-medium text-slate-700" x-html="soal.pertanyaan"></p>
+                            <div class="p-4 sm:p-5 rounded-2xl border border-green-100 bg-green-50/30 page-break">
+                                <div class="flex gap-2 sm:gap-3 mb-3 items-start">
+                                    <span class="font-bold text-green-700 w-5 sm:w-6 shrink-0 text-sm sm:text-base" x-text="index + 1 + '.'"></span>
+                                    <p class="text-xs sm:text-sm font-medium text-slate-700 break-words" x-html="soal.pertanyaan"></p>
                                 </div>
-                                <div class="ml-9 p-4 bg-white border border-green-200 rounded-xl shadow-sm">
+                                <div class="ml-7 sm:ml-9 p-3 sm:p-4 bg-white border border-green-200 rounded-xl shadow-sm">
                                     <div class="mb-2">
-                                        <span class="text-xs font-bold uppercase tracking-wider text-green-600 mb-1 block">Kunci Jawaban:</span>
-                                        <p class="font-bold text-slate-800" x-text="soal.kunci"></p>
+                                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-green-600 mb-1 block">Kunci Jawaban:</span>
+                                        <p class="font-bold text-sm sm:text-base text-slate-800" x-text="soal.kunci"></p>
                                     </div>
                                     <div class="pt-2 border-t border-slate-100 mt-2">
-                                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">Pembahasan / Rubrik Penilaian:</span>
-                                        <p class="text-sm text-slate-600 leading-relaxed" x-text="soal.alasan"></p>
+                                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">Pembahasan / Rubrik Penilaian:</span>
+                                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" x-text="soal.alasan"></p>
                                     </div>
                                 </div>
                             </div>
@@ -984,26 +988,26 @@ Format JSON:
                     </div>
 
                     <div x-show="activeTab === 'kisi'" class="overflow-x-auto page-break">
-                        <table class="w-full text-sm text-left border-collapse border border-slate-200">
+                        <table class="w-full text-xs sm:text-sm text-left border-collapse border border-slate-200">
                             <thead class="bg-slate-100 text-slate-700 font-semibold">
                                 <tr>
-                                    <th class="border border-slate-200 px-3 py-2 text-center w-10">No</th>
-                                    <th class="border border-slate-200 px-3 py-2">Materi / Topik</th>
-                                    <th class="border border-slate-200 px-3 py-2">Indikator Soal</th>
-                                    <th class="border border-slate-200 px-3 py-2 text-center">Bentuk Soal</th>
-                                    <th class="border border-slate-200 px-3 py-2 text-center">Level Kognitif</th>
-                                    <th class="border border-slate-200 px-3 py-2 text-center">Tingkat Kesulitan</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2 text-center w-8 sm:w-10">No</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2">Materi / Topik</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2 min-w-[150px]">Indikator Soal</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2 text-center">Bentuk Soal</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2 text-center">Level Kognitif</th>
+                                    <th class="border border-slate-200 px-2 sm:px-3 py-2 text-center">Tingkat Kesulitan</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="(soal, index) in results" :key="'kisi-'+index">
                                     <tr class="hover:bg-slate-50">
-                                        <td class="border border-slate-200 px-3 py-2 text-center font-medium" x-text="index + 1"></td>
-                                        <td class="border border-slate-200 px-3 py-2" x-text="formData.topik"></td>
-                                        <td class="border border-slate-200 px-3 py-2 text-slate-600" x-text="soal.indikator"></td>
-                                        <td class="border border-slate-200 px-3 py-2 text-center"><span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-semibold border border-blue-100" x-text="soal.jenis"></span></td>
-                                        <td class="border border-slate-200 px-3 py-2 text-center"><span class="bg-purple-50 text-purple-600 px-2 py-0.5 rounded text-xs font-semibold border border-purple-100" x-text="typeof soal.kognitif === 'string' ? soal.kognitif.split(' ')[0] : '-'"></span></td>
-                                        <td class="border border-slate-200 px-3 py-2 text-center" x-text="soal.kesulitan"></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 text-center font-medium" x-text="index + 1"></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 break-words" x-text="formData.topik"></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 text-slate-600 break-words" x-text="soal.indikator"></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 text-center"><span class="bg-blue-50 text-blue-600 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold border border-blue-100 whitespace-nowrap" x-text="soal.jenis"></span></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 text-center"><span class="bg-purple-50 text-purple-600 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-semibold border border-purple-100 whitespace-nowrap" x-text="typeof soal.kognitif === 'string' ? soal.kognitif.split(' ')[0] : '-'"></span></td>
+                                        <td class="border border-slate-200 px-2 sm:px-3 py-2 text-center whitespace-nowrap" x-text="soal.kesulitan"></td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -1028,7 +1032,7 @@ Format JSON:
                 </button>
             </div>
             
-            <div class="p-5 overflow-y-auto flex-1 space-y-6">
+            <div class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-6">
                 <!-- PENGATURAN API KEY GEMINI (UNTUK WEB MANDIRI) -->
                 <div>
                     <h4 class="text-sm font-bold text-blue-600 flex items-center gap-2 mb-3">
@@ -1056,7 +1060,7 @@ Format JSON:
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Alamat Sekolah</label>
                             <input type="text" x-model="kopSurat.alamat" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Jl. ...">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Telepon</label>
                                 <input type="text" x-model="kopSurat.telepon" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none transition" placeholder="(021)...">
@@ -1073,7 +1077,7 @@ Format JSON:
                     <h4 class="text-sm font-bold text-green-600 flex items-center gap-2 mb-3">
                         <i class="ph-fill ph-image"></i> Logo Sekolah
                     </h4>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div class="w-20 h-20 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
                             <template x-if="kopSurat.logo">
                                 <img :src="kopSurat.logo" class="w-full h-full object-contain">
@@ -1099,7 +1103,7 @@ Format JSON:
             </div>
             
             <div class="p-4 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
-                <button @click="showSettingsModal = false" class="bg-primary text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[#4a3bb5] shadow-sm transition">Tutup & Simpan</button>
+                <button @click="showSettingsModal = false" class="w-full sm:w-auto bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#4a3bb5] shadow-sm transition">Tutup & Simpan</button>
             </div>
         </div>
     </div>
