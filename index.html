@@ -53,7 +53,6 @@
                 isLoading: false,
                 activeTab: 'soal', 
                 
-                // PERBAIKAN FATAL ANTI-BLANK SCREEN: Variabel dikosongkan di awal agar tidak crash
                 apiKey: '', 
                 
                 toast: { show: false, message: '', type: 'info' },
@@ -102,11 +101,23 @@
                         this.editingIndex = null;
                     }
                 },
+
+                // FUNGSI KHUSUS MENYIMPAN API KEY (Menghindari crash di HTML akibat ekstensi spoofer)
+                saveApiKey() {
+                    try {
+                        if (typeof localStorage !== 'undefined') {
+                            localStorage.setItem('geminiApiKey', this.apiKey);
+                        }
+                    } catch (e) {
+                        console.warn("Gagal menyimpan ke LocalStorage akibat restriksi browser.");
+                    }
+                },
                 
                 init() {
-                    // PENGAMAN AMAN: LocalStorage hanya dipanggil di dalam zona yang dilindungi
                     try {
-                        this.apiKey = localStorage.getItem('geminiApiKey') || '';
+                        if (typeof localStorage !== 'undefined') {
+                            this.apiKey = localStorage.getItem('geminiApiKey') || '';
+                        }
                     } catch (e) {
                         console.warn("Akses LocalStorage diblokir oleh browser (Incognito/Spoofer).");
                     }
@@ -453,8 +464,9 @@ Format JSON:
                             const resultJson = await response.json();
 
                             if (!response.ok || resultJson.error) {
-                                const errCode = resultJson.error?.code || response.status;
-                                const errMsg = resultJson.error?.message || "Terjadi kesalahan yang tidak diketahui.";
+                                // Mencegah fitur optional chaining agar tidak crash di browser lama/ketat
+                                const errCode = (resultJson.error && resultJson.error.code) ? resultJson.error.code : response.status;
+                                const errMsg = (resultJson.error && resultJson.error.message) ? resultJson.error.message : "Terjadi kesalahan yang tidak diketahui.";
                                 
                                 if (errCode === 503 || errCode === 429) {
                                     throw new Error("OVERLOAD"); 
@@ -552,7 +564,8 @@ Format JSON:
     </script>
     
 </head>
-<body class="text-slate-800 font-sans" x-data="appData" x-cloak>
+<!-- PENGHAPUSAN FITUR x-cloak PADA BODY AGAR LAYAR TIDAK PERNAH BLANK PUTIH -->
+<body class="text-slate-800 font-sans bg-[#F8F9FE]" x-data="appData">
 
     <div x-show="toast.show" style="display: none;" 
          class="fixed top-6 right-6 z-[100] px-5 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-all no-print"
@@ -579,7 +592,6 @@ Format JSON:
         </div>
     </nav>
 
-    <!-- CONTAINER UTAMA DIPERBARUI UNTUK MOBILE -->
     <main class="max-w-[1400px] mx-auto p-3 sm:p-4 md:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6 items-start">
         
         <aside class="w-full lg:w-[350px] shrink-0 space-y-4 no-print">
@@ -612,7 +624,6 @@ Format JSON:
                     <i class="ph-fill ph-identification-card text-primary"></i> Identitas Soal
                 </h2>
                 <div class="space-y-4">
-                    <!-- RESPONSIVE GRID -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nama Guru</label>
@@ -623,7 +634,6 @@ Format JSON:
                             <input type="text" x-model="kopSurat.sekolah" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none transition" placeholder="Nama Sekolah">
                         </div>
                     </div>
-                    <!-- RESPONSIVE GRID -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Jenjang</label>
@@ -654,7 +664,6 @@ Format JSON:
                     <i class="ph-fill ph-sliders text-primary"></i> Konfigurasi Soal
                 </h2>
                 
-                <!-- RESPONSIVE GRID -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="text-[11px] font-semibold text-slate-500 mb-1.5 block">Jenis Asesmen</label>
@@ -744,10 +753,8 @@ Format JSON:
 
         </aside>
 
-        <!-- FLEX HEIGHT DIBUAT FLEKSIBEL UNTUK MOBILE AGAR TIDAK TERPOTONG -->
         <section class="flex-1 w-full flex flex-col min-h-[600px] lg:h-[calc(100vh-100px)] print-area">
             
-            <!-- HEADER KANAN DIPERBARUI AGAR BISA MEMBUNGKUS (WRAP) DI HP -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 mb-4 flex flex-col xl:flex-row gap-3 items-start xl:items-center justify-between no-print">
                 <div class="flex gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 overflow-x-auto w-full xl:w-auto">
                     <button @click="activeTab = 'soal'" :class="activeTab === 'soal' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap shrink-0">
@@ -761,7 +768,6 @@ Format JSON:
                     </button>
                 </div>
                 
-                <!-- TOMBOL EKSPOR DIUBAH MENJADI FLEX-WRAP AGAR AMAN DI LAYAR KECIL -->
                 <div class="flex flex-wrap gap-2 items-center w-full xl:w-auto">
                     <input type="file" id="importFile" accept=".json" class="hidden" @change="handleImport">
                     <button @click="triggerImport" class="bg-amber-50 text-amber-600 hover:bg-amber-100 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 border border-amber-200" title="Import JSON">
@@ -1049,7 +1055,7 @@ Format JSON:
                     </h4>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">API Key Google Studio</label>
-                        <input type="password" x-model="apiKey" @input="try { localStorage.setItem('geminiApiKey', apiKey) } catch(e) {}" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Mulai dengan AIzaSy...">
+                        <input type="password" x-model="apiKey" @input="saveApiKey()" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Mulai dengan AIzaSy...">
                         <p class="text-[10px] text-slate-400 mt-1.5">Kunci ini akan disimpan aman secara lokal di memori browser perangkat Anda.</p>
                     </div>
                 </div>
