@@ -140,12 +140,16 @@
                     });
                 },
 
-                // KEMBALI MENGGUNAKAN STANDAR ALPINE.JS MURNI UNTUK DROPDOWN
-                get kelasList() {
-                    const j = String(this.formData.jenjang || '');
-                    if (j.includes('SMP')) return [7, 8, 9];
-                    if (j.includes('SMA') || j.includes('SMK')) return [10, 11, 12];
-                    return [1, 2, 3, 4, 5, 6]; 
+                // ANTI-CRASH: Menggunakan HTML murni untuk menghindari penghapusan template oleh browser HP
+                get kelasOptionsHtml() {
+                    try {
+                        const j = String(this.formData.jenjang || '');
+                        let list = [1, 2, 3, 4, 5, 6];
+                        if (j.includes('SMP')) list = [7, 8, 9];
+                        if (j.includes('SMA') || j.includes('SMK')) list = [10, 11, 12];
+                        
+                        return list.map(i => `<option value="${i}">Kelas ${i}</option>`).join('');
+                    } catch(e) { return `<option value="1">Kelas 1</option>`; }
                 },
 
                 get mapelGroups() {
@@ -170,6 +174,21 @@
                             options: ['Pendidikan Agama dan Budi Pekerti', 'Pendidikan Pancasila / PKn', 'Bahasa Indonesia', 'Matematika', 'Ilmu Pengetahuan Alam (IPA)', 'Ilmu Pengetahuan Sosial (IPS)', 'Bahasa Inggris', 'PJOK', 'Seni Budaya']
                         }, muatanLokal
                     ];
+                },
+
+                // ANTI-CRASH: Menggunakan HTML murni untuk menghindari penghapusan template oleh browser HP
+                get mapelOptionsHtml() {
+                    try {
+                        let html = '';
+                        this.mapelGroups.forEach(group => {
+                            html += `<optgroup label="${group.label}">`;
+                            group.options.forEach(mapel => {
+                                html += `<option value="${mapel}">${mapel}</option>`;
+                            });
+                            html += `</optgroup>`;
+                        });
+                        return html;
+                    } catch(e) { return `<option value="IPA">IPA</option>`; }
                 },
 
                 get totalSoal() {
@@ -622,26 +641,14 @@ Format JSON:
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Kelas</label>
-                            <!-- KEMBALI KE STANDAR ALPINE MURNI: <template x-for> -->
-                            <select x-model="formData.kelas" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
-                                <template x-for="i in kelasList" :key="i">
-                                    <option :value="i" x-text="'Kelas ' + i"></option>
-                                </template>
-                            </select>
+                            <!-- KEMBALI MENGGUNAKAN X-HTML SEBAGAI SOLUSI ANTI-CRASH -->
+                            <select x-model="formData.kelas" x-html="kelasOptionsHtml" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none"></select>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Mata Pelajaran</label>
-                        <!-- KEMBALI KE STANDAR ALPINE MURNI: <template x-for> -->
-                        <select x-model="formData.mapel" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
-                            <template x-for="group in mapelGroups" :key="group.label">
-                                <optgroup :label="group.label">
-                                    <template x-for="item in group.options" :key="item">
-                                        <option :value="item" x-text="item"></option>
-                                    </template>
-                                </optgroup>
-                            </template>
-                        </select>
+                        <!-- KEMBALI MENGGUNAKAN X-HTML SEBAGAI SOLUSI ANTI-CRASH -->
+                        <select x-model="formData.mapel" x-html="mapelOptionsHtml" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none"></select>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Topik/Materi <span class="text-red-500">*</span></label>
@@ -737,8 +744,10 @@ Format JSON:
 
                 <button @click="generateSoal" :disabled="isLoading || !formData.topik" class="w-full bg-primary text-white font-semibold py-3 px-4 rounded-xl hover:bg-[#4a3bb5] transition duration-200 flex justify-center items-center gap-2 shadow-md shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed">
                     <i x-show="!isLoading" class="ph-bold ph-magic-wand"></i>
-                    <i x-show="isLoading" class="ph-bold ph-spinner animate-spin"></i>
-                    <span x-text="isLoading ? 'Merakit Soal...' : 'Buat Soal Otomatis'"></span>
+                    <!-- PERBAIKAN: Menambahkan style display none agar ikon tidak berjejer dengan teks -->
+                    <i x-show="isLoading" class="ph-bold ph-spinner animate-spin" style="display: none;"></i>
+                    <!-- PERBAIKAN: Menambahkan fallback text agar tombol tidak kosong saat Alpine Error -->
+                    <span x-text="isLoading ? 'Merakit Soal...' : 'Buat Soal Otomatis'">Buat Soal Otomatis</span>
                 </button>
             </div>
 
