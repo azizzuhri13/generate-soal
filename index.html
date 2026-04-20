@@ -140,16 +140,12 @@
                     });
                 },
 
-                // KEMBALI KE METODE X-HTML YANG TERBUKTI 100% BERHASIL DAN ANTI-ERROR DI BROWSER
-                get kelasOptionsHtml() {
-                    try {
-                        const j = String(this.formData.jenjang || '');
-                        let list = [1, 2, 3, 4, 5, 6];
-                        if (j.includes('SMP')) list = [7, 8, 9];
-                        if (j.includes('SMA') || j.includes('SMK')) list = [10, 11, 12];
-                        
-                        return list.map(i => `<option value="${i}">Kelas ${i}</option>`).join('');
-                    } catch(e) { return `<option value="1">Kelas 1</option>`; }
+                // KEMBALI MENGGUNAKAN STANDAR ALPINE.JS MURNI UNTUK DROPDOWN
+                get kelasList() {
+                    const j = String(this.formData.jenjang || '');
+                    if (j.includes('SMP')) return [7, 8, 9];
+                    if (j.includes('SMA') || j.includes('SMK')) return [10, 11, 12];
+                    return [1, 2, 3, 4, 5, 6]; 
                 },
 
                 get mapelGroups() {
@@ -176,24 +172,15 @@
                     ];
                 },
 
-                get mapelOptionsHtml() {
-                    try {
-                        let html = '';
-                        this.mapelGroups.forEach(group => {
-                            html += `<optgroup label="${group.label}">`;
-                            group.options.forEach(mapel => {
-                                html += `<option value="${mapel}">${mapel}</option>`;
-                            });
-                            html += `</optgroup>`;
-                        });
-                        return html;
-                    } catch(e) { return `<option value="IPA">IPA</option>`; }
-                },
-
                 get totalSoal() {
                     return (parseInt(this.formData.jumlahPG) || 0) + 
                            (parseInt(this.formData.jumlahIsian) || 0) + 
                            (parseInt(this.formData.jumlahEssay) || 0);
+                },
+
+                triggerLogoUpload() {
+                    const el = document.getElementById('logoUpload');
+                    if (el) el.click();
                 },
 
                 handleLogoUpload(event) {
@@ -635,12 +622,26 @@ Format JSON:
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Kelas</label>
-                            <select x-model="formData.kelas" x-html="kelasOptionsHtml" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none"></select>
+                            <!-- KEMBALI KE STANDAR ALPINE MURNI: <template x-for> -->
+                            <select x-model="formData.kelas" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
+                                <template x-for="i in kelasList" :key="i">
+                                    <option :value="i" x-text="'Kelas ' + i"></option>
+                                </template>
+                            </select>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Mata Pelajaran</label>
-                        <select x-model="formData.mapel" x-html="mapelOptionsHtml" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none"></select>
+                        <!-- KEMBALI KE STANDAR ALPINE MURNI: <template x-for> -->
+                        <select x-model="formData.mapel" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-primary outline-none">
+                            <template x-for="group in mapelGroups" :key="group.label">
+                                <optgroup :label="group.label">
+                                    <template x-for="item in group.options" :key="item">
+                                        <option :value="item" x-text="item"></option>
+                                    </template>
+                                </optgroup>
+                            </template>
+                        </select>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Topik/Materi <span class="text-red-500">*</span></label>
@@ -747,7 +748,6 @@ Format JSON:
             
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 mb-4 flex flex-col xl:flex-row gap-3 items-start xl:items-center justify-between no-print">
                 <div class="flex gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 overflow-x-auto w-full xl:w-auto">
-                    <!-- FUNGSI TOMBOL SUDAH DIPERBAIKI -->
                     <button @click="activeTab = 'soal'" :class="activeTab === 'soal' ? 'bg-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'" class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap shrink-0">
                         <i class="ph-fill ph-file-text"></i> Soal
                     </button>
@@ -776,7 +776,6 @@ Format JSON:
                     <button @click="printDoc" class="bg-slate-100 text-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 border border-slate-300">
                         <i class="ph-fill ph-printer"></i> Print
                     </button>
-                    <!-- FUNGSI TOMBOL SUDAH DIPERBAIKI -->
                     <button @click="showSettingsModal = true" class="bg-slate-100 text-slate-700 hover:bg-slate-200 p-1.5 rounded-md text-lg flex items-center justify-center border border-slate-300 transition" title="Pengaturan Kop Surat">
                         <i class="ph-fill ph-gear"></i>
                     </button>
@@ -1047,7 +1046,6 @@ Format JSON:
                     </h4>
                     <div>
                         <label class="text-xs font-semibold text-slate-500 mb-1.5 block">API Key Google Studio</label>
-                        <!-- KEMBALI KE METODE PALING AMAN -->
                         <input type="password" x-model="apiKey" @input="saveApiKey" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Mulai dengan AIzaSy...">
                         <p class="text-[10px] text-slate-400 mt-1.5">Kunci ini akan disimpan aman secara lokal di memori browser perangkat Anda.</p>
                     </div>
@@ -1097,7 +1095,7 @@ Format JSON:
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <input type="file" id="logoUpload" accept="image/png, image/jpeg" class="hidden" @change="handleLogoUpload">
-                                <button @click="document.getElementById('logoUpload').click()" class="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition">
+                                <button @click="triggerLogoUpload" class="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition">
                                     <i class="ph-bold ph-upload-simple"></i> Upload Logo
                                 </button>
                                 <button @click="removeLogo" x-show="kopSurat.logo" class="bg-red-50 text-red-500 hover:bg-red-100 p-1.5 rounded-lg transition" title="Hapus Logo">
@@ -1130,7 +1128,7 @@ Format JSON:
             </div>
             <div class="flex gap-3 justify-end mt-6">
                 <button @click="deleteConfirm = { show: false, index: null }" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
-                <button @click="confirmDelete" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 shadow-sm shadow-red-500/30 transition flex items-center gap-2">
+                <button @click="confirmDelete()" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 shadow-sm shadow-red-500/30 transition flex items-center gap-2">
                     <i class="ph-bold ph-trash"></i> Ya, Hapus
                 </button>
             </div>
